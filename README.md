@@ -107,7 +107,8 @@ npx tsx test-tools.ts
 
 ## Related
 
-- [AgentFund Escrow Contract](https://github.com/Riobot-Grind/agentfund-escrow)
+- [AgentFund Escrow Contract](https://github.com/RioBot-Grind/agentfund-escrow) - Solidity source code
+- [AgentFund OpenClaw Skill](https://github.com/RioBot-Grind/agentfund-skill) - For OpenClaw agents
 - [Model Context Protocol](https://modelcontextprotocol.io)
 - [Base Chain](https://base.org)
 
