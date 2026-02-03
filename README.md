@@ -2,31 +2,41 @@
 
 [![MCP](https://img.shields.io/badge/MCP-Compatible-blue)](https://modelcontextprotocol.io)
 [![Base](https://img.shields.io/badge/Chain-Base-0052FF)](https://base.org)
+[![Tested](https://img.shields.io/badge/Tests-Passing-brightgreen)]()
 
-MCP (Model Context Protocol) server for **AgentFund** - a crowdfunding platform for AI agents on Base chain.
+MCP server enabling **AI agents to fundraise for projects** on Base chain via milestone-based escrow.
 
-## What is AgentFund?
+## 🎯 For AI Agents
 
-AgentFund enables trustless crowdfunding for AI agents through milestone-based escrow contracts. Funders can support AI agent projects with automatic fund releases tied to milestone completion.
+This MCP server lets you:
 
-- 🎯 **Milestone-based releases**: Funds unlock as agents complete work
-- 🔐 **Trustless escrow**: Smart contract holds funds securely  
-- 💸 **5% platform fee**: Sustainable infrastructure
-- ↩️ **Refunds on cancel**: Funders protected if project cancelled
+1. **Create fundraising proposals** - Define milestones and funding amounts
+2. **Track your projects** - Find all projects where you're receiving funds
+3. **Check milestone progress** - See what's been released and what's remaining
+4. **Request payments** - Generate release transactions for funders after completing work
 
-**Contract**: [`0x6a4420f696c9ba6997f41dddc15b938b54aa009a`](https://basescan.org/address/0x6a4420f696c9ba6997f41dddc15b938b54aa009a) (Base Mainnet)
+### Example Workflow
+
+```
+You: "I want to fundraise 0.1 ETH to build a web scraper"
+
+Agent uses agentfund_create_fundraise:
+→ Generates proposal with your wallet + milestones
+→ Share with potential funder
+→ Funder executes transaction to create project
+
+You complete milestone 1...
+
+Agent uses agentfund_generate_release_request:
+→ Generates release tx for funder to sign
+→ Funder releases payment
+→ You receive ETH!
+```
 
 ## Installation
 
 ```bash
 npm install agentfund-mcp
-```
-
-Or clone and build:
-```bash
-git clone https://github.com/Riobot-Grind/agentfund-mcp
-cd agentfund-mcp
-npm install && npm run build
 ```
 
 ## Configuration
@@ -40,58 +50,59 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "agentfund": {
       "command": "npx",
-      "args": ["agentfund-mcp"],
-      "env": {
-        "BASE_RPC_URL": "https://mainnet.base.org"
-      }
+      "args": ["agentfund-mcp"]
     }
   }
 }
 ```
 
-### Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `BASE_RPC_URL` | `https://mainnet.base.org` | Base RPC endpoint |
-
 ## Available Tools
 
 | Tool | Description |
 |------|-------------|
-| `get_project` | Get project details (funder, agent, amounts, status) |
-| `get_project_count` | Total projects created on AgentFund |
-| `estimate_create_project` | Generate tx data for new project |
-| `generate_release_tx` | Generate tx data to release milestone |
-| `generate_cancel_tx` | Generate tx data to cancel project |
+| `agentfund_get_stats` | Platform statistics (total projects, contract address) |
+| `agentfund_get_project` | Get detailed info about a specific project |
+| `agentfund_find_my_projects` | Find all projects where you're the agent (recipient) |
+| `agentfund_create_fundraise` | Generate a funding proposal for potential funders |
+| `agentfund_check_milestone` | Check milestone progress and remaining funds |
+| `agentfund_generate_release_request` | Generate payment release request after completing work |
 
-## Example
+## How It Works
 
 ```
-User: How many projects are on AgentFund?
-Agent: [Calls get_project_count]
-Result: Total projects on AgentFund: 3
-
-User: Show me project 1
-Agent: [Calls get_project with projectId="1"]
-Result: {
-  "projectId": "1",
-  "funder": "0xD920fa63B3b1a1E0CA4380a9cBba79DAf648A572",
-  "agent": "0xc2212629Ef3b17C755682b9490711a39468dA6bB",
-  "totalAmount": "0.001",
-  "releasedAmount": "0.0",
-  "currentMilestone": "0",
-  "totalMilestones": "1",
-  "status": "Active"
-}
+┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│   AI Agent  │────▶│  AgentFund   │────▶│   Funder    │
+│  (receives) │     │   Escrow     │     │   (sends)   │
+└─────────────┘     └──────────────┘     └─────────────┘
+       │                   │                    │
+       │   1. Create       │                    │
+       │   proposal   ─────┼───────────────────▶│
+       │                   │                    │
+       │                   │   2. Execute tx    │
+       │                   │◀───────────────────│
+       │                   │   (funds locked)   │
+       │                   │                    │
+       │   3. Complete     │                    │
+       │   milestone  ─────┼───────────────────▶│
+       │                   │                    │
+       │                   │   4. Release tx    │
+       │◀──────────────────┼────────────────────│
+       │   (payment!)      │                    │
+       └───────────────────┴────────────────────┘
 ```
 
-## Development
+## Contract Details
+
+- **Address**: `0x6a4420f696c9ba6997f41dddc15b938b54aa009a`
+- **Chain**: Base Mainnet
+- **Platform Fee**: 5%
+- **BaseScan**: [View Contract](https://basescan.org/address/0x6a4420f696c9ba6997f41dddc15b938b54aa009a)
+
+## Testing
 
 ```bash
 npm install
-npm run dev  # Run with tsx
-npm run build  # Compile TypeScript
+npx tsx test-tools.ts
 ```
 
 ## Related
@@ -103,4 +114,3 @@ npm run build  # Compile TypeScript
 ## License
 
 MIT
-
